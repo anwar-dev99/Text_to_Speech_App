@@ -1,8 +1,10 @@
+import streamlit as st
 import asyncio
 import edge_tts
+import os
 
 # General-purpose default script
-quality_script = """
+tts_text = """
 Hello and welcome!
 
 This is a sample text-to-speech demonstration.  
@@ -15,9 +17,18 @@ Feel free to customize this script with your own content, whether for education,
 Thank you for listening, and have a great day!
 """
 
-# إعداد TTS
-async def main():
-    tts = edge_tts.Communicate(quality_script, voice="en-GB-RyanNeural")
-    await tts.save("general_tts_demo.mp3")
+async def generate_tts(text, file_path):
+    tts = edge_tts.Communicate(text, voice="en-GB-RyanNeural")
+    await tts.save(file_path)
 
-asyncio.run(main())
+st.title("Text-to-Speech Demo")
+
+if st.button("Generate and Play Audio"):
+    output_file = "general_tts_demo.mp3"
+    # Run async function to generate audio
+    asyncio.run(generate_tts(tts_text, output_file))
+    
+    if os.path.exists(output_file):
+        st.success("Audio generated successfully!")
+        with open(output_file, "rb") as f:
+            st.audio(f.read(), format="audio/mp3")
