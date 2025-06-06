@@ -17,15 +17,16 @@ voice_map = {
 }
 
 async def generate_tts(text, voice, file_path):
-    tts = edge_tts.Communicate(text, voice=voice)
-    await tts.save(file_path)
+    try:
+        tts = edge_tts.Communicate(text, voice=voice)
+        await tts.save(file_path)
+        return True, None
+    except Exception as e:
+        return False, str(e)
 
 st.title("Text-to-Speech Demo (English & Arabic)")
 
-# Language selection
 language = st.selectbox("Select Language:", ["English", "Arabic"])
-
-# Gender selection
 gender = st.radio("Select Voice Gender:", ["Male", "Female"])
 
 user_text = st.text_area("Enter text to convert to speech:", height=150, max_chars=max_chars)
@@ -41,9 +42,11 @@ else:
         else:
             selected_voice = voice_map[language][gender]
             output_file = "user_tts_demo.mp3"
-            asyncio.run(generate_tts(user_text, selected_voice, output_file))
 
-            if os.path.exists(output_file):
+            # Run the async function and handle errors
+            success, error_msg = asyncio.run(generate_tts(user_text, selected_voice, output_file))
+
+            if success:
                 st.success("Audio generated successfully!")
                 with open(output_file, "rb") as f:
                     audio_bytes = f.read()
@@ -54,3 +57,5 @@ else:
                     file_name="tts_audio.mp3",
                     mime="audio/mp3"
                 )
+            else:
+                st.error(f"Failed to generate audio: {error_msg}")
