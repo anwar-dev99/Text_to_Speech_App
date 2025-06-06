@@ -3,19 +3,7 @@ import asyncio
 import edge_tts
 import os
 
-# General-purpose default script
-tts_text = """
-Hello and welcome!
-
-This is a sample text-to-speech demonstration.  
-You can use this script to generate spoken audio from any text you like.  
-
-Text-to-speech technology helps make information more accessible and engaging by converting written words into natural-sounding speech.
-
-Feel free to customize this script with your own content, whether for education, entertainment, or communication.
-
-Thank you for listening, and have a great day!
-"""
+max_chars = 2000
 
 async def generate_tts(text, file_path):
     tts = edge_tts.Communicate(text, voice="en-GB-RyanNeural")
@@ -23,12 +11,29 @@ async def generate_tts(text, file_path):
 
 st.title("Text-to-Speech Demo")
 
-if st.button("Generate and Play Audio"):
-    output_file = "general_tts_demo.mp3"
-    # Run async function to generate audio
-    asyncio.run(generate_tts(tts_text, output_file))
-    
-    if os.path.exists(output_file):
-        st.success("Audio generated successfully!")
-        with open(output_file, "rb") as f:
-            st.audio(f.read(), format="audio/mp3")
+user_text = st.text_area("Enter text to convert to speech:", height=150, max_chars=max_chars)
+chars_used = len(user_text)
+st.write(f"Characters used: {chars_used}/{max_chars}")
+
+if chars_used > max_chars:
+    st.error(f"Please limit your input to {max_chars} characters or less.")
+else:
+    if st.button("Generate and Play Audio"):
+        if user_text.strip() == "":
+            st.warning("Please enter some text to generate speech.")
+        else:
+            output_file = "user_tts_demo.mp3"
+            # Generate TTS audio asynchronously
+            asyncio.run(generate_tts(user_text, output_file))
+
+            if os.path.exists(output_file):
+                st.success("Audio generated successfully!")
+                with open(output_file, "rb") as f:
+                    audio_bytes = f.read()
+                    st.audio(audio_bytes, format="audio/mp3")
+                st.download_button(
+                    label="Download Audio",
+                    data=audio_bytes,
+                    file_name="tts_audio.mp3",
+                    mime="audio/mp3"
+                )
