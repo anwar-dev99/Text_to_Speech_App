@@ -5,7 +5,7 @@ import os
 
 # ----------------- Config ----------------- #
 st.set_page_config(
-    page_title="Vocalize AI",
+    page_title="Text To Speech App",
     page_icon="🎙️",
     layout="centered"
 )
@@ -33,6 +33,10 @@ st.markdown("""
         margin-top: 3em;
         color: #888;
     }
+    .github-icon {
+        vertical-align: middle;
+        margin-right: 5px;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -59,9 +63,8 @@ async def generate_tts(text, voice, file_path):
         return False, str(e)
 
 # -------------- App Title ----------------- #
-st.title("🎙️ Vocalize AI")
-st.markdown("##### Convert text to realistic speech in English or Arabic using AI voices.")
-st.markdown("Easily listen to your message and download it as MP3. Great for education, communication, accessibility, or content creation!")
+st.title("🎙️ Text To Speech App")
+st.markdown("##### Convert text to speech in English or Arabic.")
 
 # ----------- Input Section --------------- #
 col1, col2 = st.columns(2)
@@ -93,3 +96,13 @@ elif st.button("🔊 Generate and Play Audio"):
             st.download_button("⬇️ Download MP3", audio_bytes, file_name="tts_audio.mp3", mime="audio/mp3")
         else:
             st.error(f"❌ Failed to generate audio: {error_msg}")
+
+# ------------- Developer Attribution ------------ #
+st.markdown("""
+<div class="footer">
+  <a href="https://github.com/anwar-dev99" target="_blank">
+    <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="20" class="github-icon"/> 
+    Developed by Anwar Alsulami
+  </a>
+</div>
+""", unsafe_allow_html=True)
